@@ -6,6 +6,7 @@ const userRoutes = require('./userRoutes');
 const productRoutes = require('./productRoutes');
 const recipeRoutes = require('./recipeRoutes');
 const paqueteRoutes = require('./paqueteRoutes');
+const authRoutes = require('./authRoutes');
 
 // Ruta de test
 router.get('/ping', async (req, res) => {
@@ -25,5 +26,7 @@ router.use('/productos', productRoutes);
 router.use('/recetas', recipeRoutes);
 // Rutas ABM de paquetes
 router.use('/paquetes', paqueteRoutes);
+// Rutas de autenticación
+router.use('/auth', authRoutes);
 
 module.exports = router;

@@ -24,7 +24,9 @@ const createPaquete = async (req, res) => {
     const paquete = await Paquete.createPaquete(req.body);
     res.status(201).json(paquete);
   } catch (err) {
-    res.status(500).json({ error: 'Error al crear paquete' });
+    // Agregamos log para ver detalles del error
+    console.error('Error al crear paquete:', err);
+    res.status(500).json({ error: 'Error al crear paquete', details: err.message });
   }
 };
 
@@ -33,7 +35,8 @@ const updatePaquete = async (req, res) => {
     await Paquete.updatePaquete(req.params.id, req.body);
     res.json({ message: 'Paquete actualizado' });
   } catch (err) {
-    res.status(500).json({ error: 'Error al actualizar paquete' });
+    console.error('Error al actualizar paquete:', err);
+    res.status(500).json({ error: 'Error al actualizar paquete', details: err.message });
   }
 };
 

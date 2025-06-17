@@ -25,12 +25,17 @@ const createPaquete = async (paqueteData) => {
     const paqueteId = result.insertId;
     if (items && items.length) {
       await Promise.all(
-        items.map(item =>
-          conn.query(
+        items.map(async (item) => {
+          // Validar que el producto exista
+          const [prod] = await conn.query('SELECT id FROM productos WHERE id = ?', [item.producto_id]);
+          if (!prod.length) {
+            throw new Error(`Producto con id ${item.producto_id} no existe`);
+          }
+          await conn.query(
             'INSERT INTO items_paquete (paquete_id, producto_id, cantidad, precio_unitario) VALUES (?, ?, ?, ?)',
             [paqueteId, item.producto_id, item.cantidad, item.precio_unitario]
-          )
-        )
+          );
+        })
       );
     }
     await conn.commit();
@@ -48,6 +53,11 @@ const updatePaquete = async (id, paqueteData) => {
   const conn = await db.getConnection();
   try {
     await conn.beginTransaction();
+    // Verificar que el paquete exista
+    const [existing] = await conn.query('SELECT id FROM paquetes WHERE id = ?', [id]);
+    if (!existing.length) {
+      throw new Error(`Paquete con id ${id} no existe`);
+    }
     await conn.query(
       'UPDATE paquetes SET numero_orden = ?, usuario_id = ?, total = ?, estado = ?, direccion_envio = ?, fecha_creacion = ? WHERE id = ?',
       [numero_orden, usuario_id, total, estado, direccion_envio, fecha_creacion, id]
@@ -55,12 +65,17 @@ const updatePaquete = async (id, paqueteData) => {
     await conn.query('DELETE FROM items_paquete WHERE paquete_id = ?', [id]);
     if (items && items.length) {
       await Promise.all(
-        items.map(item =>
-          conn.query(
+        items.map(async (item) => {
+          // Validar que el producto exista
+          const [prod] = await conn.query('SELECT id FROM productos WHERE id = ?', [item.producto_id]);
+          if (!prod.length) {
+            throw new Error(`Producto con id ${item.producto_id} no existe`);
+          }
+          await conn.query(
             'INSERT INTO items_paquete (paquete_id, producto_id, cantidad, precio_unitario) VALUES (?, ?, ?, ?)',
             [id, item.producto_id, item.cantidad, item.precio_unitario]
-          )
-        )
+          );
+        })
       );
     }
     await conn.commit();
